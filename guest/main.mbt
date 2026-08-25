@@ -109,6 +109,7 @@ fn run_descriptor_probe(
     raise @transport.Failure("USB device descriptor response is invalid")
   }
   transport.close()
+  println("wasee guest: usb open/close=0")
 }
 
 ///|
