@@ -1,0 +1,45 @@
+package madk:aoa;
+
+interface usb-host {
+  type device-id = u32;
+  type endpoint = u8;
+
+  record device-info {
+    id: device-id,
+    vendor-id: u16,
+    product-id: u16,
+  }
+
+  record control-request {
+    request-type: u8,
+    request: u8,
+    value: u16,
+    index: u16,
+  }
+
+  record transfer-options {
+    timeout-ms: u32,
+    max-bytes: u32,
+  }
+
+  variant error {
+    not-found,
+    permission-denied,
+    unsupported,
+    timeout,
+    disconnected,
+    transfer-failed(string),
+  }
+
+  list-devices: func() -> result<list<device-info>, error>;
+  open: func(device: device-id) -> result<u32, error>;
+  control-in: func(handle: u32, request: control-request, options: transfer-options) -> result<list<u8>, error>;
+  control-out: func(handle: u32, request: control-request, data: list<u8>, options: transfer-options) -> result<u32, error>;
+  bulk-read: func(handle: u32, endpoint: endpoint, options: transfer-options) -> result<list<u8>, error>;
+  bulk-write: func(handle: u32, endpoint: endpoint, data: list<u8>, options: transfer-options) -> result<u32, error>;
+  close: func(handle: u32) -> result<_, error>;
+}
+
+world aoa-host {
+  import usb-host;
+}

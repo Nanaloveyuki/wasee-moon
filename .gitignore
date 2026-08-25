@@ -1,0 +1,10 @@
+.gradle/
+.mooncakes/
+moon.work
+_build/
+build/
+target/
+*.swp
+*.tmp
+android/app/src/main/assets/guest/guest.wasm
+android/app/src/test/resources/guest/guest.wasm
