@@ -1,0 +1,65 @@
+name: validation
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: validation-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  moon:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - name: Install MoonBit
+        shell: bash
+        run: |
+          curl -fsSL https://cli.moonbitlang.com/install/unix.sh | bash -s "$(cat .moon-version)"
+          echo "$HOME/.moon/bin" >> "$GITHUB_PATH"
+      - run: moon version --all
+      - run: moon update
+      - run: moon fmt --check
+      - run: moon check bridge --target wasm --deny-warn
+      - run: moon check guest --target wasm --deny-warn
+      - run: moon check --target all --deny-warn
+      - run: moon test --target all --deny-warn
+      - run: moon build guest --target wasm --release
+      - run: git diff --check
+
+  android-build:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - name: Install MoonBit
+        shell: bash
+        run: |
+          curl -fsSL https://cli.moonbitlang.com/install/unix.sh | bash -s "$(cat .moon-version)"
+          echo "$HOME/.moon/bin" >> "$GITHUB_PATH"
+      - uses: actions/setup-java@cf277c60eb254670d1f99cc633dbcf757c94c7933
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: android-actions/setup-android@9fc6c4e9069bf8d3d10b2204b1fb8f6ef7065407
+        with:
+          packages: 'platform-tools'
+      - name: Install Android build packages
+        shell: bash
+        run: |
+          sdkmanager "platforms;android-36" "build-tools;37.0.0"
+      - uses: gradle/actions/setup-gradle@ed408507eac070d1f99cc633dbcf757c94c7933a
+        with:
+          gradle-version: '9.6.1'
+      - name: Build debug APK
+        working-directory: android
+        run: gradle :app:testDebugUnitTest :app:assembleDebug --no-daemon

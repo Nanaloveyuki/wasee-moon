@@ -1,0 +1,5 @@
+import {
+  "Nanaloveyuki/madk/transport",
+}
+
+supported_targets = "wasm"

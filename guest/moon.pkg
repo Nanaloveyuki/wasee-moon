@@ -1,0 +1,11 @@
+import {
+  "Nanaloveyuki/madk",
+  "Nanaloveyuki/madk/transport",
+  "Nanaloveyuki/wasee-moon/bridge",
+  "moonbitlang/core/buffer",
+  "moonbitlang/core/encoding/utf8",
+}
+
+pkgtype(kind: "executable")
+
+supported_targets = "wasm"
