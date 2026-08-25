@@ -46,6 +46,7 @@ jobs:
         run: |
           curl -fsSL https://cli.moonbitlang.com/install/unix.sh | bash -s "$(cat .moon-version)"
           echo "$HOME/.moon/bin" >> "$GITHUB_PATH"
+      - run: moon update
       - uses: actions/setup-java@cf277c60eb25467037889841efdb72551f06f6c3
         with:
           distribution: temurin
